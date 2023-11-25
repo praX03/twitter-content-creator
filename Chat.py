@@ -6,6 +6,7 @@ import time
 import openai
 import os
 from dotenv import load_dotenv
+from mongodb_handler import insert_document
 
 
 def Chat():
@@ -16,7 +17,18 @@ def Chat():
     st.sidebar.header("Required Details")
     name = st.sidebar.text_input("Name:*", key="Please Enter Your Name")
     email = st.sidebar.text_input("Email:*", key="Please Enter Your Email")
-   
+    if st.sidebar.button("Start Chat"):
+        if name and email:
+            # Insert data into MongoDB
+            insert_document({"name": name, "email": email})
+            st.sidebar.success("Data submitted successfully!")
+            st.session_state.start_chat = True
+            # Create a thread once and store its ID in session state
+            thread = client.beta.threads.create()
+            st.session_state.thread_id = thread.id
+            st.write("thread id: ", thread.id)
+        else:
+            st.sidebar.error("Please fill in all the fields.")
     # if ((name == "") | (email == "")):
     #     st.sidebar.warning("Please enter your Name and Email")
     # else:
@@ -59,19 +71,15 @@ def Chat():
         #     )
 
     # Button to start the chat session
-    if st.sidebar.button("Start Chat"):
-        if ((name == "") | (email == "")):
-            st.sidebar.warning("Please enter your Name and Email")
-        else:
-        # Check if files are uploaded before starting chat
-        # if st.session_state.file_id_list:
-            st.session_state.start_chat = True
-            # Create a thread once and store its ID in session state
-            thread = client.beta.threads.create()
-            st.session_state.thread_id = thread.id
-            st.write("thread id: ", thread.id)
-            # else:
-            #     st.sidebar.warning("Please upload at least one file to start the chat.")
+    # if st.sidebar.button("Start Chat"):
+    #     if ((name == "") | (email == "")):
+    #         st.sidebar.warning("Please enter your Name and Email")
+    #     else:
+    #     # Check if files are uploaded before starting chat
+    #     # if st.session_state.file_id_list:
+            
+    #         # else:
+    #         #     st.sidebar.warning("Please upload at least one file to start the chat.")
 
 
     # Define the function to process messages with citations
