@@ -28,3 +28,4 @@ def initialise_assistant():
 
     if 'show_alternate' not in st.session_state:
             st.session_state.show_alternate = False
+    return(st.session_state.page, st.session_state.file_id_list, st.session_state.start_chat, st.session_state.thread_id)

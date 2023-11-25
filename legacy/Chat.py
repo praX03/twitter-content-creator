@@ -13,26 +13,42 @@ def Chat():
     load_dotenv()
     openai.api_key= os.getenv('OPENAI_API_KEY')
     client = openai
-    initialise_assistant()
+    # initialise_assistant()
+    if 'page' not in st.session_state:
+        st.session_state.page = 'entry'
+
+    # Initialize session state variables for file IDs and chat control
+    if "file_id_list" not in st.session_state:
+        st.session_state.file_id_list = []
+
+    if "start_chat" not in st.session_state:
+        st.session_state.start_chat = False
+
+    if "thread_id" not in st.session_state:
+        st.session_state.thread_id = None
+
+    if 'show_alternate' not in st.session_state:
+            st.session_state.show_alternate = False
     thread = client.beta.threads.create()
     st.session_state.thread_id = thread.id
     st.write("thread id: ", thread.id)
     
-    # Show different sidebar based on the session state
-    def show_alternate_sidebar():
-        st.sidebar.header("Alternate Sidebar")
-        st.sidebar.write("This is the alternate sidebar.")
-    # Function to show the default sidebar
-    def show_default_sidebar():
-        pass
-
     # Function to show the alternate sidebar
-    
+    st.sidebar.header("Required Details")
+    name = st.sidebar.text_input("Name:*", key="Please Enter Your Name")
+    email = st.sidebar.text_input("Email:*", key="Please Enter Your Email")
+    if st.sidebar.button("Submit"):
+            if name and email:
+                # Insert data into MongoDB
+                insert_document({"name": name, "email": email})
+                st.sidebar.success("Data submitted successfully!")
+                # st.session_state.show_alternate = True
+                st.session_state.start_chat = True
+                st.rerun()
+            else:
+                st.sidebar.error("Please fill in all the fields.")
         
-    if st.session_state.show_alternate == False:
-        show_default_sidebar()
-    else:
-        pass
+    
         # show_alternate_sidebar()
     # if ((name == "") | (email == "")):
     #     st.sidebar.warning("Please enter your Name and Email")
@@ -128,6 +144,7 @@ def Chat():
 
         # Display existing messages in the chat
         for message in st.session_state.messages:
+            print(message)
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
@@ -185,19 +202,7 @@ def Chat():
             Enter your **Name** and **Email** to start.
         """
     )
-        st.sidebar.header("Required Details")
-        name = st.sidebar.text_input("Name:*", key="Please Enter Your Name")
-        email = st.sidebar.text_input("Email:*", key="Please Enter Your Email")
-        if st.sidebar.button("Submit"):
-                if name and email:
-                    # Insert data into MongoDB
-                    insert_document({"name": name, "email": email})
-                    st.sidebar.success("Data submitted successfully!")
-                    st.session_state.show_alternate = True
-                    st.session_state.start_chat = True
-                    st.rerun()
-                else:
-                    st.sidebar.error("Please fill in all the fields.")
+        
         col1, col2, col3 = st.columns(3)
         # Prompt to start the chat
         with col1:

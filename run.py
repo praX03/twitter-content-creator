@@ -12,8 +12,7 @@ load_dotenv()
 openai.api_key= os.getenv('OPENAI_API_KEY')
 # Set your OpenAI Assistant ID here
 assistant_id = 'asst_2wGjCp2rUUBf1SYLkXoL6MOn'
-instruction="As the 'Twitter Content Creator', your primary role is to assist users in generating engaging and appropriate content specifically for Twitter. This includes creating images with minimal text and ensuring the text is verified for correctness before inclusion. You will inquire about the type of content the user desires, which can range from professional, casual, humorous, informative, to inspirational. For Twitter, you will focus on scripts for tweets, ensuring that the content is relevant, engaging, and suitable for the Twitter platform. After each interaction, you will summarize your understanding of the user's needs and present a confidence score from 0 to 100, reflecting your certainty in fulfilling the requirements. You will adapt your responses to the specific context of the user's needs, aiming to create ideal Twitter-specific content while ensuring user satisfaction. Users will provide clear, detailed input about their desired content and offer feedback to refine your output."
-# Initialize the OpenAI client (ensure to set your API key in the sidebar within the app)
+instruction="As a 'Twitter Content Creator', your key responsibility is to assist users in crafting engaging, platform-appropriate content for Twitter. This role involves creating visually appealing images with minimal text, verifying the accuracy of any text included. You are expected to engage with users to understand their desired content type, which may vary from professional to casual, humorous, informative, or inspirational themes. Your focus will include drafting tweet scripts that are relevant, captivating, and tailored for the Twitter audience. Draft relevant, engaging tweet scripts within a 280-character limit. Following each interaction, summarize your understanding of the user's requirements, assigning a confidence score from 0 to 100 to indicate your assurance in meeting their needs. You should make 3 tweets and take user's opinion, based on their opinion you should choose the leading tweet. Adaptability to the unique context of each user's request is crucial, aiming to deliver optimal, Twitter-specific content while maximizing user satisfaction. Your role extends to creating posts that drive organic reach, engagement, and profile visits, fostering a growing follower base. These followers enhance our domain authority, amplifying our influence over the audience and fostering a vibrant community. At the beginning of each conversation, warmly welcome the user and succinctly describe your capabilities, encouraging them to engage with your services for their Twitter content needs."# Initialize the OpenAI client (ensure to set your API key in the sidebar within the app)
 client = openai
 
 # def initialise_assistant():
@@ -66,55 +65,53 @@ def upload_to_openai(filepath):
 #     openai.api_key = api_key
 
 # Additional features in the sidebar for web scraping and file uploading
-st.sidebar.header("Required Details")
-name = st.sidebar.text_input("Name:*", key="Please Enter Your Name")
-email = st.sidebar.text_input("Email:*", key="Please Enter Your Email")
-if st.sidebar.button("Submit"):
-    if ((name == "") | (email == "")):
-        st.sidebar.warning("Please enter your Name and Email")
-    else:
-        # TODO: Implement Pushing to Databse
-        pass
-st.sidebar.header("Additional Features")
-website_url = st.sidebar.text_input("Enter a website URL to scrape and organize into a PDF", key="website_url")
+# st.sidebar.header("Required Details")
+
+# if st.sidebar.button("Submit"):
+    # if ((name == "") | (email == "")):
+    #     st.sidebar.warning("Please enter your Name and Email")
+    # else:
+    #     # TODO: Implement Pushing to Databse
+    #     pass
+# st.sidebar.header("Additional Features")
+# website_url = st.sidebar.text_input("Enter a website URL to scrape and organize into a PDF", key="website_url")
 
 # Button to scrape a website, convert to PDF, and upload to OpenAI
-if st.sidebar.button("Scrape and Upload"):
-    # Scrape, convert, and upload process
-    scraped_text = scrape_website(website_url)
-    pdf_path = text_to_pdf(scraped_text, "scraped_content.pdf")
-    file_id = upload_to_openai(pdf_path)
-    st.session_state.file_id_list.append(file_id)
-    #st.sidebar.write(f"File ID: {file_id}")
+# if st.sidebar.button("Scrape and Upload"):
+#     # Scrape, convert, and upload process
+#     scraped_text = scrape_website(website_url)
+#     pdf_path = text_to_pdf(scraped_text, "scraped_content.pdf")
+#     file_id = upload_to_openai(pdf_path)
+#     st.session_state.file_id_list.append(file_id)
+#     #st.sidebar.write(f"File ID: {file_id}")
 
-# Sidebar option for users to upload their own files
-uploaded_file = st.sidebar.file_uploader("Upload a file to OpenAI embeddings", key="file_uploader")
+# # Sidebar option for users to upload their own files
+# uploaded_file = st.sidebar.file_uploader("Upload a file to OpenAI embeddings", key="file_uploader")
 
-# Button to upload a user's file and store the file ID
-if st.sidebar.button("Upload File"):
-    # Upload file provided by user
-    if uploaded_file:
-        with open(f"{uploaded_file.name}", "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        additional_file_id = upload_to_openai(f"{uploaded_file.name}")
-        st.session_state.file_id_list.append(additional_file_id)
-        st.sidebar.write(f"Additional File ID: {additional_file_id}")
+# # Button to upload a user's file and store the file ID
+# if st.sidebar.button("Upload File"):
+#     # Upload file provided by user
+#     if uploaded_file:
+#         with open(f"{uploaded_file.name}", "wb") as f:
+#             f.write(uploaded_file.getbuffer())
+#         additional_file_id = upload_to_openai(f"{uploaded_file.name}")
+#         st.session_state.file_id_list.append(additional_file_id)
+#         st.sidebar.write(f"Additional File ID: {additional_file_id}")
 
-# Display all file IDs
-if st.session_state.file_id_list:
-    st.sidebar.write("Uploaded File IDs:")
-    for file_id in st.session_state.file_id_list:
-        st.sidebar.write(file_id)
-        # Associate files with the assistant
-        assistant_file = client.beta.assistants.files.create(
-            assistant_id=assistant_id, 
-            file_id=file_id
-        )
+# # Display all file IDs
+# if st.session_state.file_id_list:
+#     st.sidebar.write("Uploaded File IDs:")
+#     for file_id in st.session_state.file_id_list:
+#         st.sidebar.write(file_id)
+#         # Associate files with the assistant
+#         assistant_file = client.beta.assistants.files.create(
+#             assistant_id=assistant_id, 
+#             file_id=file_id
+#         )
 
 # Button to start the chat session
 if st.sidebar.button("Start Chat"):
-    # Check if files are uploaded before starting chat
-    # if st.session_state.file_id_list:
+    
     st.session_state.start_chat = True
     # Create a thread once and store its ID in session state
     thread = client.beta.threads.create()
@@ -213,4 +210,9 @@ if st.session_state.start_chat:
                 st.markdown(full_response, unsafe_allow_html=True)
 else:
     # Prompt to start the chat
-    st.write("Please upload files and click 'Start Chat' to begin the conversation.")
+    # name = st.sidebar.text_input("Name:*", key="Please Enter Your Name")
+    # email = st.sidebar.text_input("Email:*", key="Please Enter Your Email")
+    # if ((name == "") | (email == "")):
+    #     st.sidebar.warning("Please enter your Name and Email")
+    
+    st.write("Please click 'Start Chat' to begin the conversation.")
