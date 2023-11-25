@@ -14,21 +14,26 @@ def Chat():
     openai.api_key= os.getenv('OPENAI_API_KEY')
     client = openai
     initialise_assistant()
-    st.sidebar.header("Required Details")
-    name = st.sidebar.text_input("Name:*", key="Please Enter Your Name")
-    email = st.sidebar.text_input("Email:*", key="Please Enter Your Email")
-    if st.sidebar.button("Start Chat"):
-        if name and email:
-            # Insert data into MongoDB
-            insert_document({"name": name, "email": email})
-            st.sidebar.success("Data submitted successfully!")
-            st.session_state.start_chat = True
-            # Create a thread once and store its ID in session state
-            thread = client.beta.threads.create()
-            st.session_state.thread_id = thread.id
-            st.write("thread id: ", thread.id)
-        else:
-            st.sidebar.error("Please fill in all the fields.")
+    thread = client.beta.threads.create()
+    st.session_state.thread_id = thread.id
+    st.write("thread id: ", thread.id)
+    
+    # Show different sidebar based on the session state
+    def show_alternate_sidebar():
+        st.sidebar.header("Alternate Sidebar")
+        st.sidebar.write("This is the alternate sidebar.")
+    # Function to show the default sidebar
+    def show_default_sidebar():
+        pass
+
+    # Function to show the alternate sidebar
+    
+        
+    if st.session_state.show_alternate == False:
+        show_default_sidebar()
+    else:
+        pass
+        # show_alternate_sidebar()
     # if ((name == "") | (email == "")):
     #     st.sidebar.warning("Please enter your Name and Email")
     # else:
@@ -171,8 +176,33 @@ def Chat():
                 with st.chat_message("assistant"):
                     st.markdown(full_response, unsafe_allow_html=True)
     else:
+        st.sidebar.markdown(
+             
+        """
+           
+            #### 🌟 Get Started:
+            Give TweetNet a try! Just a quick chat, and you’ll see how we can transform your Twitter experience. \n
+            Enter your **Name** and **Email** to start.
+        """
+    )
+        st.sidebar.header("Required Details")
+        name = st.sidebar.text_input("Name:*", key="Please Enter Your Name")
+        email = st.sidebar.text_input("Email:*", key="Please Enter Your Email")
+        if st.sidebar.button("Submit"):
+                if name and email:
+                    # Insert data into MongoDB
+                    insert_document({"name": name, "email": email})
+                    st.sidebar.success("Data submitted successfully!")
+                    st.session_state.show_alternate = True
+                    st.session_state.start_chat = True
+                    st.rerun()
+                else:
+                    st.sidebar.error("Please fill in all the fields.")
+        col1, col2, col3 = st.columns(3)
         # Prompt to start the chat
-         st.markdown(
+        with col1:
+            st.markdown(
+             
         """
             
             #### 🚀 Elevate Your Twitter Presence:
@@ -180,19 +210,29 @@ def Chat():
 
             #### 🎨 Visual Appeal Meets Precision:
             Create stunning images complemented by concise, accurate text. Perfectly tailored for Twitter's dynamic platform.
-
+       """
+    )
+        with col2:
+            st.markdown(
+             
+        """
             #### ✏️ Custom Content Creation:
             Just tell us your style - professional, humorous, informative? Our bot drafts engaging, relevant tweet scripts within the 280-character limit.
 
             #### 📊 Smart Analytics:
             After each tweet, get an instant word count. Track and refine your content strategy for maximum impact.
 
+            """
+    )
+        with col3:
+            st.markdown(
+             
+        """
             #### 🔍 Targeted Organic Growth:
             Our bot is not just about creating tweets; it's about building your brand. Gain organic reach, engagement, and followers. Watch as your community grow!
 
-            #### 🌟 Get Started:
-            Give TweetNet a try! Just a quick chat, and you’ll see how we can transform your Twitter experience. Enter your name and email to start.
-        """
+             """
     )
+        
 
 Chat()

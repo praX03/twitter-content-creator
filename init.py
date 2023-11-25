@@ -25,3 +25,6 @@ def initialise_assistant():
 
     if "thread_id" not in st.session_state:
         st.session_state.thread_id = None
+
+    if 'show_alternate' not in st.session_state:
+            st.session_state.show_alternate = False
